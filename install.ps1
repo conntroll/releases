@@ -4,8 +4,10 @@
 
 $ErrorActionPreference = 'Stop'
 
-if ($args.Length -gt 0) {
-  $Version = $args.Get(0)
+$Version = if ($args.Length -gt 0) {
+  $args.Get(0)
+} else {
+  "latest"
 }
 
 if ($PSVersionTable.PSEdition -ne 'Core') {
@@ -21,34 +23,34 @@ $BinDir = if ($K0sInstall) {
     "$K0sInstall/bin"
   }
 } elseif ($IsWindows) {
-  "$Home\.deno\bin"
+  "$Home\.k0s\bin"
 } else {
-  "$Home/.local/bin"
+  "$Home/.k0s/bin"
 }
 
 $Zip = if ($IsWindows) {
   'zip'
 } else {
-  'gz'
+  'tar.gz'
 }
 
 $K0sZip = if ($IsWindows) {
-  "$BinDir\deno.$Zip"
+  "$BinDir\k0s.$Zip"
 } else {
-  "$BinDir/deno.$Zip"
+  "$BinDir/k0s.$Zip"
 }
 
 $K0sExe = if ($IsWindows) {
-  "$BinDir\deno.exe"
+  "$BinDir\k0s.exe"
 } else {
-  "$BinDir/deno"
+  "$BinDir/k0s"
 }
 
 $OS = if ($IsWindows) {
-  'win'
+  'windows'
 } else {
   if ($IsMacOS) {
-    'osx'
+    'darwin'
   } else {
     'linux'
   }
@@ -58,10 +60,10 @@ $OS = if ($IsWindows) {
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $K0sUri = if (!$Version) {
-  $Response = Invoke-WebRequest 'https://github.com/denoland/deno/releases' -UseBasicParsing
+  $Response = Invoke-WebRequest 'https://github.com/btwiuse/k0s/releases' -UseBasicParsing
   if ($PSVersionTable.PSEdition -eq 'Core') {
     $Response.Links |
-      Where-Object { $_.href -like "/denoland/deno/releases/download/*/deno_${OS}_x64.$Zip" } |
+      Where-Object { $_.href -like "/btwiuse/k0s/releases/download/*/${OS}-amd64-k0s.$Zip" } |
       ForEach-Object { 'https://github.com' + $_.href } |
       Select-Object -First 1
   } else {
@@ -73,12 +75,12 @@ $K0sUri = if (!$Version) {
       $HTMLFile.write($ResponseBytes)
     }
     $HTMLFile.getElementsByTagName('a') |
-      Where-Object { $_.href -like "about:/denoland/deno/releases/download/*/deno_${OS}_x64.$Zip" } |
+      Where-Object { $_.href -like "about:/btwiuse/k0s/releases/download/*/${OS}-amd64-k0s.$Zip" } |
       ForEach-Object { $_.href -replace 'about:', 'https://github.com' } |
       Select-Object -First 1
   }
 } else {
-  "https://github.com/denoland/deno/releases/download/$Version/deno_${OS}_x64.$Zip"
+  "https://github.com/btwiuse/k0s/releases/download/$Version/${OS}-amd64-k0s.$Zip"
 }
 
 if (!(Test-Path $BinDir)) {
@@ -101,16 +103,16 @@ if ($IsWindows) {
     [Environment]::SetEnvironmentVariable('Path', "$Path;$BinDir", $User)
     $Env:Path += ";$BinDir"
   }
-  Write-Output "K0s was installed successfully to $K0sExe"
-  Write-Output "Run 'deno --help' to get started"
+  Write-Output "k0s was installed successfully to $K0sExe"
+  Write-Output "Run 'k0s -version' to get started"
 } else {
-  chmod +x "$BinDir/deno"
-  Write-Output "K0s was installed successfully to $K0sExe"
-  if (Get-Command deno -ErrorAction SilentlyContinue) {
-    Write-Output "Run 'deno --help' to get started"
+  chmod +x "$BinDir/k0s"
+  Write-Output "k0s was installed successfully to $K0sExe"
+  if (Get-Command k0s -ErrorAction SilentlyContinue) {
+    Write-Output "Run 'k0s -version' to get started"
   } else {
     Write-Output "Manually add the directory to your `$HOME/.bash_profile (or similar)"
     Write-Output "  export PATH=`"${BinDir}:`$PATH`""
-    Write-Output "Run '$K0sExe --help' to get started"
+    Write-Output "Run '$K0sExe -version' to get started"
   }
 }
