@@ -22,6 +22,7 @@ osarch(){
     i386) arch="386" ;;
     armv8l) arch="arm64" ;;
     armv8b) arch="arm64" ;;
+    armv7l) arch="armv7" ;;
     aarch64) arch="arm64" ;;
     aarch64_be) arch="arm64" ;;
     *) arch="other" ;;
