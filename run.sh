@@ -3,12 +3,20 @@
 set -e
 
 osarch(){
-  case $(uname -s) in
+  uname_s="$(uname -s)"
+  uname_o="$(uname -o)"
+  uname_m="$(uname -m)"
+  case "${uname_s}" in
     Darwin) os="darwin" ;;
     *) os="linux" ;;
   esac
 
-  case $(uname -m) in
+  case "${uname_o}" in
+    Android) os="android" ;;
+    *) true ;;
+  esac
+
+  case "${uname_m}" in
     x86_64) arch="amd64" ;;
     i686) arch="386" ;;
     i386) arch="386" ;;
@@ -21,7 +29,7 @@ osarch(){
 
   if [ "$arch" = "other" ]; then
     >&2 cat <<EOF
-    "[ERROR] Architecture $(uname -m) unrecognized by this script. 
+    "[ERROR] Architecture ${uname_m} unrecognized by this script. 
     Please go to https://get.k0s.io/latest/ to download it manually, 
     and submit an issue at https://github.com/btwiuse/k0s/issues" 1>&2
 EOF
