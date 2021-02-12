@@ -58,7 +58,7 @@ install(){
   # bindir="${HOME}/.local/bin/k0s"
   mkdir -p "${bindir}"
   compressed="$(echo "$(osarch)"/k0s.tar.gz | tr / -)"
-  dl "https://github.com/btwiuse/k0s/releases/download/latest/${compressed}" | tar -C "${bindir}" -xz k0s
+  dl "https://github.com/btwiuse/k0s/releases/download/${1:-latest}/${compressed}" | tar -C "${bindir}" -xz k0s
   cat <<EOF
         Successfully installed k0s to ${bin}
         Please add the directory to your PATH
@@ -70,7 +70,7 @@ EOF
 }
 
 main(){
-  install # && /bin/k0s client -version
+  install "${@}"# && /bin/k0s client -version
 }
 
 main "${@}"
