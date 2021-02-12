@@ -70,7 +70,7 @@ EOF
 }
 
 main(){
-  install "${@}"# && /bin/k0s client -version
+  install "${@}" # && /bin/k0s client -version
 }
 
 main "${@}"
